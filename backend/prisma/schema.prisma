@@ -1,0 +1,80 @@
+// Prisma Schema - 数据库模型定义
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// 用户表
+model User {
+  id        String      @id @default(uuid())
+  email     String      @unique
+  username  String      @unique
+  password  String
+  avatar    String?
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  playlists Playlist[]
+  favorites Favorite[]
+}
+
+// 歌曲表
+model Song {
+  id        String      @id @default(uuid())
+  title     String
+  artist    String
+  album     String?
+  duration  Int         // 秒
+  filePath  String
+  coverUrl  String?
+  lyricsPath String?
+  genre     String?
+  year      Int?
+  playCount Int         @default(0)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  playlists PlaylistSong[]
+  favorites Favorite[]
+}
+
+// 播放列表
+model Playlist {
+  id          String         @id @default(uuid())
+  name        String
+  description String?
+  coverUrl    String?
+  userId      String
+  user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  songs       PlaylistSong[]
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+}
+
+// 播放列表-歌曲关联表
+model PlaylistSong {
+  id         String   @id @default(uuid())
+  playlistId String
+  songId     String
+  position   Int      // 歌曲在播放列表中的位置
+  playlist   Playlist @relation(fields: [playlistId], references: [id], onDelete: Cascade)
+  song       Song     @relation(fields: [songId], references: [id], onDelete: Cascade)
+  addedAt    DateTime @default(now())
+
+  @@unique([playlistId, songId])
+}
+
+// 收藏表
+model Favorite {
+  id        String   @id @default(uuid())
+  userId    String
+  songId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  song      Song     @relation(fields: [songId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, songId])
+}
