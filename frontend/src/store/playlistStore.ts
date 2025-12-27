@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { Playlist, Song } from '@/types';
+import type { Playlist } from '@/types';
 import { playlistApi } from '@/services/api';
 
 interface PlaylistState {
@@ -18,7 +18,7 @@ interface PlaylistState {
   setCurrentPlaylist: (playlist: Playlist | null) => void;
 }
 
-export const usePlaylistStore = create<PlaylistState>((set, get) => ({
+export const usePlaylistStore = create<PlaylistState>((set) => ({
   playlists: [],
   currentPlaylist: null,
   isLoading: false,
