@@ -182,3 +182,42 @@ export const incrementPlayCount = async (req: Request, res: Response) => {
     res.status(500).json({ error: '更新播放次数失败' });
   }
 };
+
+// 导入网易云歌曲
+export const importNeteaseSong = async (req: Request, res: Response) => {
+  try {
+    const { neteaseId, title, artist, album, duration, coverUrl } = req.body;
+
+    if (!neteaseId || !title) {
+      return res.status(400).json({ error: '缺少必要参数' });
+    }
+
+    // 检查是否已导入
+    const existingSong = await prisma.song.findFirst({
+      where: { neteaseId: neteaseId.toString() },
+    });
+
+    if (existingSong) {
+      return res.status(400).json({ error: '该歌曲已导入', data: existingSong });
+    }
+
+    // 创建歌曲记录，filePath 存储网易云外链格式
+    const song = await prisma.song.create({
+      data: {
+        title,
+        artist: artist || '未知艺术家',
+        album: album || null,
+        duration: Math.floor(duration || 0),
+        filePath: `https://music.163.com/song/media/outer/url?id=${neteaseId}.mp3`,
+        coverUrl: coverUrl || null,
+        neteaseId: neteaseId.toString(),
+        source: 'netease',
+      },
+    });
+
+    res.status(201).json({ data: song, message: '歌曲导入成功' });
+  } catch (error) {
+    console.error('导入歌曲失败:', error);
+    res.status(500).json({ error: '导入歌曲失败' });
+  }
+};

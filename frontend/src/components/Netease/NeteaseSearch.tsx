@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { Search, Cloud, Play, Loader, Music, X } from 'lucide-react';
-import { neteaseApi } from '@/services/api';
+import { Search, Cloud, Play, Loader, Music, X, Download, Check } from 'lucide-react';
+import { neteaseApi, songApi } from '@/services/api';
 import { usePlayerStore } from '@/store/playerStore';
 import type { Song } from '@/types';
 
@@ -14,6 +14,8 @@ export default function NeteaseSearch({ isOpen, onClose }: NeteaseSearchProps) {
   const [songs, setSongs] = useState<Song[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [importingId, setImportingId] = useState<string | null>(null);
+  const [importedIds, setImportedIds] = useState<Set<string>>(new Set());
   const { playSong, currentSong } = usePlayerStore();
 
   const handleSearch = async () => {
@@ -64,6 +66,41 @@ export default function NeteaseSearch({ isOpen, onClose }: NeteaseSearchProps) {
     } catch (err) {
       console.error('获取播放地址失败:', err);
       alert('获取播放地址失败');
+    }
+  };
+
+  const handleImport = async (song: Song, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const neteaseId = String(song.neteaseId || song.id.replace('netease_', ''));
+    
+    if (importedIds.has(neteaseId)) return;
+    
+    setImportingId(neteaseId);
+    try {
+      // 获取歌曲详情以获取封面
+      const detailResponse = await neteaseApi.getSongDetail(neteaseId.toString()).catch(() => ({ data: null }));
+      
+      await songApi.importFromNetease({
+        neteaseId: neteaseId.toString(),
+        title: song.title,
+        artist: song.artist,
+        album: song.album,
+        duration: song.duration,
+        coverUrl: detailResponse.data?.coverUrl || song.coverUrl,
+      });
+      
+      setImportedIds(prev => new Set(prev).add(String(neteaseId)));
+      alert('歌曲导入成功！');
+    } catch (err: any) {
+      if (err.response?.data?.error === '该歌曲已导入') {
+        setImportedIds(prev => new Set(prev).add(String(neteaseId)));
+        alert('该歌曲已导入过');
+      } else {
+        console.error('导入失败:', err);
+        alert('导入失败，请稍后重试');
+      }
+    } finally {
+      setImportingId(null);
     }
   };
 
@@ -180,6 +217,31 @@ export default function NeteaseSearch({ isOpen, onClose }: NeteaseSearchProps) {
                     <div className="hidden md:block w-32 text-sm text-gray-400 truncate">
                       {song.album || '-'}
                     </div>
+
+                    {/* 导入按钮 */}
+                    {(() => {
+                      const songNeteaseId = String(song.neteaseId || song.id.replace('netease_', ''));
+                      const isImported = importedIds.has(songNeteaseId);
+                      const isImporting = importingId === songNeteaseId;
+                      return (
+                        <button
+                          className={`p-2 transition-colors ${
+                            isImported ? 'text-green-500' : 'text-gray-400 hover:text-blue-500'
+                          }`}
+                          onClick={(e) => handleImport(song, e)}
+                          disabled={isImporting}
+                          title={isImported ? '已导入' : '导入到音乐库'}
+                        >
+                          {isImporting ? (
+                            <Loader className="w-5 h-5 animate-spin" />
+                          ) : isImported ? (
+                            <Check className="w-5 h-5" />
+                          ) : (
+                            <Download className="w-5 h-5" />
+                          )}
+                        </button>
+                      );
+                    })()}
 
                     {/* 播放按钮 */}
                     <button

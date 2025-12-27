@@ -11,6 +11,7 @@ import AuthModal from '../Auth/AuthModal';
 import PlaylistPanel from '../Playlist/PlaylistPanel';
 import HistoryPanel from '../History/HistoryPanel';
 import NeteaseSearch from '../Netease/NeteaseSearch';
+import ProfileModal from '../Profile/ProfileModal';
 import { SongListSkeleton } from '../Loading/SongSkeleton';
 
 export default function MusicList() {
@@ -23,6 +24,7 @@ export default function MusicList() {
   const [showPlaylist, setShowPlaylist] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
 const [showNetease, setShowNetease] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
   const [searchHistory, setSearchHistory] = useState<string[]>(() => {
     const saved = localStorage.getItem('searchHistory');
     return saved ? JSON.parse(saved) : [];
@@ -134,7 +136,7 @@ const [showNetease, setShowNetease] = useState(false);
 
   if (loading) {
     return (
-      <div className="max-w-6xl mx-auto px-4 py-6 bg-white/90 backdrop-blur-sm rounded-2xl my-4 shadow-lg">
+      <div className="max-w-6xl mx-auto px-4 py-6 bg-white/95 backdrop-blur-md rounded-2xl my-4 shadow-lg relative z-20">
         <div className="mb-6">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-12 h-12 bg-gray-200 rounded-xl animate-pulse" />
@@ -151,7 +153,7 @@ const [showNetease, setShowNetease] = useState(false);
 
   return (
     <>
-      <div className="max-w-6xl mx-auto px-4 py-6 bg-white/90 backdrop-blur-sm rounded-2xl my-4 shadow-lg">
+      <div className="max-w-6xl mx-auto px-4 py-6 bg-white/95 backdrop-blur-md rounded-2xl my-4 shadow-lg relative z-20">
         {/* 头部 */}
         <div className="mb-6">
           <div className="flex items-center justify-between mb-4">
@@ -198,10 +200,24 @@ const [showNetease, setShowNetease] = useState(false);
 
               {isAuthenticated ? (
                 <div className="flex items-center gap-3">
-                  <div className="flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-lg">
-                    <User className="w-5 h-5 text-gray-600" />
+                  <button
+                    onClick={() => setShowProfile(true)}
+                    className="flex items-center gap-2 px-3 py-1.5 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors cursor-pointer"
+                    title="点击查看个人中心"
+                  >
+                    {user?.avatar ? (
+                      <img 
+                        src={`http://localhost:3001${user.avatar}`} 
+                        alt="头像" 
+                        className="w-8 h-8 rounded-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center text-white text-sm font-bold">
+                        {user?.username?.charAt(0).toUpperCase()}
+                      </div>
+                    )}
                     <span className="text-sm font-medium text-gray-700">{user?.username}</span>
-                  </div>
+                  </button>
                   <button
                     onClick={logout}
                     className="p-2 text-gray-600 hover:text-red-600 transition-colors"
@@ -319,6 +335,11 @@ const [showNetease, setShowNetease] = useState(false);
       <NeteaseSearch
         isOpen={showNetease}
         onClose={() => setShowNetease(false)}
+      />
+
+      <ProfileModal
+        isOpen={showProfile}
+        onClose={() => setShowProfile(false)}
       />
     </>
   );

@@ -23,7 +23,7 @@ const storage = multer.diskStorage({
 // 文件过滤
 const fileFilter = (req: any, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
   const allowedAudioTypes = ['.mp3', '.wav', '.flac', '.m4a', '.ogg'];
-  const allowedImageTypes = ['.jpg', '.jpeg', '.png', '.webp'];
+  const allowedImageTypes = ['.jpg', '.jpeg', '.png', '.webp', '.gif'];
   const allowedLyricsTypes = ['.lrc', '.txt'];
 
   const ext = path.extname(file.originalname).toLowerCase();
@@ -31,6 +31,8 @@ const fileFilter = (req: any, file: Express.Multer.File, cb: multer.FileFilterCa
   if (file.fieldname === 'audio' && allowedAudioTypes.includes(ext)) {
     cb(null, true);
   } else if (file.fieldname === 'cover' && allowedImageTypes.includes(ext)) {
+    cb(null, true);
+  } else if (file.fieldname === 'avatar' && allowedImageTypes.includes(ext)) {
     cb(null, true);
   } else if (file.fieldname === 'lyrics' && allowedLyricsTypes.includes(ext)) {
     cb(null, true);

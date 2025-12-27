@@ -24,21 +24,23 @@ model User {
 
 // 歌曲表
 model Song {
-  id        String      @id @default(uuid())
-  title     String
-  artist    String
-  album     String?
-  duration  Int         // 秒
-  filePath  String
-  coverUrl  String?
+  id         String      @id @default(uuid())
+  title      String
+  artist     String
+  album      String?
+  duration   Int         // 秒
+  filePath   String
+  coverUrl   String?
   lyricsPath String?
-  genre     String?
-  year      Int?
-  playCount Int         @default(0)
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
-  playlists PlaylistSong[]
-  favorites Favorite[]
+  genre      String?
+  year       Int?
+  playCount  Int         @default(0)
+  neteaseId  String?     @unique // 网易云歌曲ID
+  source     String?     // 歌曲来源: local, netease
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  playlists  PlaylistSong[]
+  favorites  Favorite[]
 }
 
 // 播放列表

@@ -65,6 +65,10 @@ export const songApi = {
   // 增加播放次数
   incrementPlayCount: (id: string) =>
     api.post<any, ApiResponse<Song>>(`/songs/${id}/play`),
+
+  // 导入网易云歌曲
+  importFromNetease: (data: { neteaseId: string; title: string; artist: string; album?: string; duration?: number; coverUrl?: string }) =>
+    api.post<any, ApiResponse<Song>>('/songs/import', data),
 };
 
 // 播放列表相关API
@@ -139,6 +143,26 @@ export const userApi = {
   getById: (id: string) =>
     api.get<any, ApiResponse<User>>(`/users/${id}`),
 
+  // 获取用户统计数据
+  getStats: (userId: string) =>
+    api.get<any, ApiResponse<{ user: User; stats: { favoriteCount: number; playlistCount: number; totalPlayCount: number } }>>(`/users/${userId}/stats`),
+
+  // 更新用户资料
+  updateProfile: (userId: string, data: { username?: string; avatar?: string }) =>
+    api.put<any, ApiResponse<User>>(`/users/${userId}/profile`, data),
+
+  // 修改密码
+  changePassword: (userId: string, data: { oldPassword: string; newPassword: string }) =>
+    api.put<any, ApiResponse<void>>(`/users/${userId}/password`, data),
+
+  // 获取最常播放的歌曲
+  getMostPlayed: (userId: string, limit = 10) =>
+    api.get<any, ApiResponse<Song[]>>(`/users/${userId}/most-played`, { params: { limit } }),
+
+  // 获取用户的所有播放列表
+  getPlaylists: (userId: string) =>
+    api.get<any, ApiResponse<Playlist[]>>(`/users/${userId}/playlists`),
+
   // 获取用户收藏
   getFavorites: (userId: string) =>
     api.get<any, ApiResponse<any[]>>(`/users/${userId}/favorites`),
@@ -150,6 +174,15 @@ export const userApi = {
   // 取消收藏
   removeFavorite: (userId: string, songId: string) =>
     api.delete<any, ApiResponse<void>>(`/users/${userId}/favorites/${songId}`),
+
+  // 上传头像
+  uploadAvatar: (userId: string, file: File) => {
+    const formData = new FormData();
+    formData.append('avatar', file);
+    return api.post<any, ApiResponse<User>>(`/users/${userId}/avatar`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+  },
 };
 
 export default api;

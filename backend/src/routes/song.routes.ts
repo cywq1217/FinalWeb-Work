@@ -29,4 +29,7 @@ router.delete('/:id', songController.deleteSong);
 // 增加播放次数
 router.post('/:id/play', songController.incrementPlayCount);
 
+// 导入网易云歌曲
+router.post('/import', songController.importNeteaseSong);
+
 export default router;
