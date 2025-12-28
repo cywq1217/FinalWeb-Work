@@ -98,9 +98,10 @@ export default function UploadModal({ isOpen, onClose, onSuccess }: UploadModalP
       
       onSuccess();
       onClose();
-    } catch (error) {
+    } catch (error: any) {
       console.error('上传失败:', error);
-      alert('上传失败，请重试');
+      const errorMsg = error?.response?.data?.error || error?.message || '未知错误';
+      alert(`上传失败: ${errorMsg}`);
     } finally {
       setUploading(false);
     }

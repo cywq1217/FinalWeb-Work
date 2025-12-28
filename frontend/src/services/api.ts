@@ -52,6 +52,7 @@ export const songApi = {
   upload: (formData: FormData) =>
     api.post<any, ApiResponse<Song>>('/songs', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
+      timeout: 120000, // 上传超时2分钟
     }),
 
   // 更新歌曲信息
