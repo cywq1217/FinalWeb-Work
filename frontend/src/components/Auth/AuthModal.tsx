@@ -26,6 +26,14 @@ export default function AuthModal({ isOpen, onClose, defaultMode = 'login' }: Au
   // 邮箱格式验证
   const isValidEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
+  // 密码安全性验证
+  const validatePassword = (password: string): string | null => {
+    if (password.length < 6) return '密码长度至少6位';
+    if (!/[a-zA-Z]/.test(password)) return '密码必须包含字母';
+    if (!/[0-9]/.test(password)) return '密码必须包含数字';
+    return null;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -34,6 +42,15 @@ export default function AuthModal({ isOpen, onClose, defaultMode = 'login' }: Au
     if (!isValidEmail(formData.email)) {
       setError('请输入有效的邮箱地址');
       return;
+    }
+
+    // 注册时验证密码安全性
+    if (mode === 'register') {
+      const passwordError = validatePassword(formData.password);
+      if (passwordError) {
+        setError(passwordError);
+        return;
+      }
     }
 
     if (mode === 'register' && formData.password !== formData.confirmPassword) {

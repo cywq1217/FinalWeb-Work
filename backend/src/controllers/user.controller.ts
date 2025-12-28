@@ -9,6 +9,20 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 // 邮箱格式验证正则
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+// 密码安全性验证（至少6位，包含字母和数字）
+const isValidPassword = (password: string): { valid: boolean; message: string } => {
+  if (password.length < 6) {
+    return { valid: false, message: '密码长度至少6位' };
+  }
+  if (!/[a-zA-Z]/.test(password)) {
+    return { valid: false, message: '密码必须包含字母' };
+  }
+  if (!/[0-9]/.test(password)) {
+    return { valid: false, message: '密码必须包含数字' };
+  }
+  return { valid: true, message: '' };
+};
+
 // 用户注册
 export const register = async (req: Request, res: Response) => {
   try {
@@ -21,6 +35,12 @@ export const register = async (req: Request, res: Response) => {
     // 验证邮箱格式
     if (!emailRegex.test(email)) {
       return res.status(400).json({ error: '邮箱格式无效' });
+    }
+
+    // 验证密码安全性
+    const passwordCheck = isValidPassword(password);
+    if (!passwordCheck.valid) {
+      return res.status(400).json({ error: passwordCheck.message });
     }
 
     // 检查用户是否已存在
