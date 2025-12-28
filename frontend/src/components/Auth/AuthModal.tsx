@@ -23,9 +23,18 @@ export default function AuthModal({ isOpen, onClose, defaultMode = 'login' }: Au
 
   if (!isOpen) return null;
 
+  // 邮箱格式验证
+  const isValidEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
+    // 验证邮箱格式
+    if (!isValidEmail(formData.email)) {
+      setError('请输入有效的邮箱地址');
+      return;
+    }
 
     if (mode === 'register' && formData.password !== formData.confirmPassword) {
       setError('两次输入的密码不一致');

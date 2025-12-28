@@ -6,6 +6,9 @@ import jwt from 'jsonwebtoken';
 const prisma = new PrismaClient();
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 
+// 邮箱格式验证正则
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 // 用户注册
 export const register = async (req: Request, res: Response) => {
   try {
@@ -13,6 +16,11 @@ export const register = async (req: Request, res: Response) => {
 
     if (!email || !username || !password) {
       return res.status(400).json({ error: '请提供完整的注册信息' });
+    }
+
+    // 验证邮箱格式
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ error: '邮箱格式无效' });
     }
 
     // 检查用户是否已存在
