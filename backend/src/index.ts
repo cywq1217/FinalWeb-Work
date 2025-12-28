@@ -15,13 +15,14 @@ import neteaseRoutes from './routes/netease.routes';
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// 中间件 - 允许多个前端端口
+// 中间件 - CORS配置
+const corsOrigin = process.env.CORS_ORIGIN;
 app.use(cors({
-  origin: [
+  origin: corsOrigin === '*' ? true : [
     'http://localhost:5173',
     'http://localhost:5174',
     'http://localhost:5175',
-    process.env.CORS_ORIGIN || ''
+    corsOrigin || ''
   ].filter(Boolean),
   credentials: true,
 }));

@@ -14,6 +14,7 @@ This folder contains detailed development logs organized by development phases.
 | [06-netease-integration.md](06-netease-integration.md) | Search, playback, import | Phase 6 |
 | [07-ui-optimization.md](07-ui-optimization.md) | Animations, responsive design | Phase 7 |
 | [08-documentation.md](08-documentation.md) | Documentation, evaluation | Phase 8 |
+| [09-deployment.md](09-deployment.md) | Cloud deployment, CI/CD | Phase 9 |
 
 ## Log Format
 

@@ -3,9 +3,13 @@ import path from 'path';
 import fs from 'fs';
 
 // 确保上传目录存在
-const uploadDir = path.join(__dirname, '../../uploads');
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
+const uploadDir = process.env.UPLOAD_PATH || path.join(__dirname, '../../uploads');
+try {
+  if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+  }
+} catch (err) {
+  console.error('创建上传目录失败:', err);
 }
 
 // 配置存储
