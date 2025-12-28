@@ -76,7 +76,7 @@ export default function AuthModal({ isOpen, onClose, defaultMode = 'login' }: Au
       
       onClose();
     } catch (err: any) {
-      setError(err.response?.data?.message || '操作失败，请重试');
+      setError(err.response?.data?.error || err.response?.data?.message || '操作失败，请重试');
     } finally {
       setLoading(false);
     }
